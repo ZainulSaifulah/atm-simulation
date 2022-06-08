@@ -2,6 +2,9 @@ import data.DummyAccountData;
 import service.AccountService;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Scanner;
 
 import static util.Validator.*;
@@ -137,8 +140,9 @@ public class Application {
     }
 
     public static void summaryScreen(Scanner scanner, AccountService accountService, String amount) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder().toFormatter();
         String message = "\n" + "Summary\n" +
-                "Date : " + Instant.now().toString() + "\n" +
+                "Date : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")) + "\n" +
                 "Withdraw : $" + amount + "\n" +
                 "Balance : $" + accountService.getLoggedAccount().getBalance() + "\n" +
                 "\n" +
