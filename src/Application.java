@@ -1,7 +1,6 @@
-import data.DummyAccountData;
+import repository.AccountRepository;
 import service.AccountService;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -12,7 +11,9 @@ import static util.Validator.*;
 public class Application {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        AccountService accountService = new AccountService(new DummyAccountData());
+        String filePath = args.length != 0 ? args[0] : "./data.csv";
+        AccountRepository accountRepository = new AccountRepository(filePath);
+        AccountService accountService = new AccountService(accountRepository);
 
         while (true) {
             welcomeScreen(scanner, accountService);

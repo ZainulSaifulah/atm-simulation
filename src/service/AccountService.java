@@ -1,16 +1,17 @@
 package service;
 
-import data.DummyAccountData;
+import repository.AccountRepository;
 import entity.Account;
 
 import java.util.List;
+import java.util.Objects;
 
 public class AccountService {
     private final List<Account> accounts;
     private Account loggedAccount;
 
-    public AccountService(DummyAccountData dummyAccountData) {
-        this.accounts = dummyAccountData.getData();
+    public AccountService(AccountRepository accountRepository) {
+        this.accounts = accountRepository.findAll();
     }
 
     public List<Account> findAll() {
@@ -53,7 +54,7 @@ public class AccountService {
 
     public boolean transfer(String accountNumber, int amount) {
         Account account = findOne(accountNumber);
-        if (account.getAccountNumber() == "") {
+        if (Objects.equals(account.getAccountNumber(), "")) {
             System.out.println("Invalid account");
             return false;
         }
