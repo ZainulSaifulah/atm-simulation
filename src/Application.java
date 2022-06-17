@@ -1,27 +1,33 @@
+import entity.Transaction;
 import repository.AccountRepository;
+import repository.TransactionRepository;
 import service.AccountService;
+import service.TransactionService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
+import java.util.List;
 import java.util.Scanner;
 
 import static util.Validator.*;
 
 public class Application {
+    private static final Scanner scanner = new Scanner(System.in);
+    private static AccountService accountService;
+    private static TransactionService transactionService;
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         String filePath = args.length != 0 ? args[0] : "./data.csv";
-        AccountRepository accountRepository = new AccountRepository(filePath);
-        AccountService accountService = new AccountService(accountRepository);
+        accountService = new AccountService(new AccountRepository(filePath));
+        transactionService = new TransactionService(new TransactionRepository(), accountService);
 
         while (true) {
-            welcomeScreen(scanner, accountService);
+            welcomeScreen();
             break;
         }
     }
 
-    public static void welcomeScreen(Scanner scanner, AccountService accountService) {
+    public static void welcomeScreen() {
         while (true) {
             System.out.print("Enter Account Number: ");
             String accountNumber = scannerLogin(scanner, 6, "Account Number");
@@ -29,32 +35,34 @@ public class Application {
             String pin = scannerLogin(scanner, 6, "PIN");
 
             if (accountService.login(accountNumber, pin)) {
-                transactionScreen(scanner, accountService);
+                transactionScreen();
             }
 
             System.out.println("Invalid Account Number/PIN");
         }
     }
 
-    public static void transactionScreen(Scanner scanner, AccountService accountService) {
+    public static void transactionScreen() {
         String message = "\n" + "1. Withdraw\n" +
                 "2. Fund Transfer\n" +
-                "3. Exit\n" +
-                "Please choose option[3]: ";
+                "3. Transaction History\n" +
+                "4. Exit\n" +
+                "Please choose option[4]: ";
 
         while (true) {
             System.out.print(message);
 
             String option = scannerOption(scanner, 1, 3, message);
             switch (option) {
-                case "1" -> withdrawScreen(scanner, accountService);
-                case "2" -> fundTransferScreen(scanner, accountService);
-                default -> welcomeScreen(scanner, accountService);
+                case "1" -> withdrawScreen();
+                case "2" -> fundTransferScreen();
+                case "3" -> transactionHistoryScreen();
+                default -> welcomeScreen();
             }
         }
     }
 
-    public static void withdrawScreen(Scanner scanner, AccountService accountService) {
+    public static void withdrawScreen() {
         String message = "\n" + "1. $10\n" +
                 "2. $50\n" +
                 "3. $100\n" +
@@ -68,40 +76,40 @@ public class Application {
             String option = scannerOption(scanner, 1, 5, message);
             switch (option) {
                 case "1" -> {
-                    if (accountService.withdraw(10)) {
-                        summaryScreen(scanner, accountService, "10");
+                    if (transactionService.withdraw(10)) {
+                        summaryScreen("10");
                     }
                 }
                 case "2" -> {
-                    if (accountService.withdraw(50)) {
-                        summaryScreen(scanner, accountService, "50");
+                    if (transactionService.withdraw(50)) {
+                        summaryScreen("50");
                     }
                 }
                 case "3" -> {
-                    if (accountService.withdraw(100)) {
-                        summaryScreen(scanner, accountService, "100");
+                    if (transactionService.withdraw(100)) {
+                        summaryScreen("100");
                     }
                 }
-                case "4" -> otherWithdrawScreen(scanner, accountService);
-                default -> transactionScreen(scanner, accountService);
+                case "4" -> otherWithdrawScreen();
+                default -> transactionScreen();
             }
         }
     }
 
-    public static void otherWithdrawScreen(Scanner scanner, AccountService accountService) {
+    public static void otherWithdrawScreen() {
         String message = "\n" + "Other Withdraw\n" +
                 "Enter amount to withdraw: $";
 
         while (true) {
             System.out.print(message);
             String amount = scannerAmount(scanner, 10, 1000, message);
-            if (accountService.withdraw(Integer.parseInt(amount))) {
-                summaryScreen(scanner, accountService, amount);
+            if (transactionService.withdraw(Integer.parseInt(amount))) {
+                summaryScreen(amount);
             }
         }
     }
 
-    public static void fundTransferScreen(Scanner scanner, AccountService accountService) {
+    public static void fundTransferScreen() {
         String message1 = "\n" + "Please enter destination account and \n" +
                 "press enter to continue or \n" +
                 "press cancel (Esc) to go back to Transaction: ";
@@ -132,16 +140,15 @@ public class Application {
                     "Choose option[2]: ";
             System.out.print(message4);
             String option = scannerOption(scanner, 1, 2, message4);
-            if ("1".equals(option) && accountService.transfer(accountNumber, Integer.parseInt(amount))) {
-                summaryScreen(scanner, accountService, amount);
+            if (option.equals("1") && transactionService.transfer(accountNumber, Integer.parseInt(amount))) {
+                summaryScreen(amount);
             } else {
-                transactionScreen(scanner, accountService);
+                transactionScreen();
             }
         }
     }
 
-    public static void summaryScreen(Scanner scanner, AccountService accountService, String amount) {
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder().toFormatter();
+    public static void summaryScreen(String amount) {
         String message = "\n" + "Summary\n" +
                 "Date : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")) + "\n" +
                 "Withdraw : $" + amount + "\n" +
@@ -155,13 +162,37 @@ public class Application {
             System.out.print(message);
 
             String option = scannerOption(scanner, 1, 2, message);
-            if ("1".equals(option)) {
-                transactionScreen(scanner, accountService);
+            if (option.equals("1")) {
+                transactionScreen();
             } else {
-                welcomeScreen(scanner, accountService);
+                welcomeScreen();
             }
         }
     }
 
+    public static void transactionHistoryScreen() {
+        String message = "\n" + "Transaction History\n" +
+                String.format("%8s %8s %8s %5s %20s\n", "ID", "Type", "Source", "Amount", "Transaction Time") +
+                showTransactionHistory(transactionService.getTransactionHistory(accountService.getLoggedAccount().getAccountNumber())) +
+                "1. Transaction \n" +
+                "2. Exit\n" +
+                "Choose option[2]:";
 
+        while (true) {
+            System.out.println(message);
+            String option = scannerOption(scanner, 1, 2, message);
+            if (option.equals("1")) {
+                transactionScreen();
+            } else {
+                welcomeScreen();
+            }
+        }
+    }
+
+    public static String showTransactionHistory(List<Transaction> transactions) {
+        return transactions
+                .stream()
+                .map(Transaction::toString)
+                .reduce("", (builder, transaction) -> builder + transaction);
+    }
 }
