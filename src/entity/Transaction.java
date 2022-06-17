@@ -19,6 +19,14 @@ public class Transaction {
         this.createdAt = createdAt;
     }
 
+    public Transaction(TransactionType transactionType, SourceType sourceType, int amount, String accountNumber, LocalDateTime createdAt) {
+        this.transactionType = transactionType;
+        this.sourceType = sourceType;
+        this.amount = amount;
+        this.accountNumber = accountNumber;
+        this.createdAt = createdAt;
+    }
+
     public Long getId() {
         return id;
     }

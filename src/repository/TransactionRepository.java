@@ -8,15 +8,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TransactionRepository {
+    private final Path path = Paths.get("./transaction.csv");
 
     public List<Transaction> findAll() {
-        Path path = Paths.get("./transaction.csv");
         try {
             return Files.readAllLines(path, UTF_8)
                     .stream()
@@ -27,6 +28,33 @@ public class TransactionRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Transaction create(Transaction transaction) {
+        try {
+            transaction.setId(getId());
+            Files.writeString(
+                    path,
+                    String.format("%s%s,%s,%s,%s,%s,%s",
+                            System.lineSeparator(),
+                            transaction.getId(),
+                            transaction.getTransactionType(),
+                            transaction.getSourceType(),
+                            transaction.getAmount(),
+                            transaction.getAccountNumber(),
+                            transaction.getCreatedAt()
+                    ),
+                    UTF_8, StandardOpenOption.APPEND
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return transaction;
+    }
+
+    private Long getId() {
+        return findAll().size() + 1L;
     }
 
 }

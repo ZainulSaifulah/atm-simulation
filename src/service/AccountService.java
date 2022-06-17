@@ -6,19 +6,19 @@ import repository.AccountRepository;
 import java.util.List;
 
 public class AccountService {
-    private final List<Account> accounts;
+    private final AccountRepository accountRepository;
     private Account loggedAccount;
 
     public AccountService(AccountRepository accountRepository) {
-        this.accounts = accountRepository.findAll();
+        this.accountRepository = accountRepository;
     }
 
     public List<Account> findAll() {
-        return accounts;
+        return accountRepository.findAll();
     }
 
     public Account findOne(String accountNumber) {
-        for (Account account : accounts) {
+        for (Account account : accountRepository.findAll()) {
             if (account.getAccountNumber().equals(accountNumber)) {
                 return account;
             }
@@ -39,5 +39,9 @@ public class AccountService {
 
     public Account getLoggedAccount() {
         return this.loggedAccount;
+    }
+
+    public Account update(Account account) {
+        return accountRepository.update(account);
     }
 }

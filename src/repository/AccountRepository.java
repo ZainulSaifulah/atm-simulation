@@ -2,10 +2,13 @@ package repository;
 
 import entity.Account;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -14,14 +17,13 @@ import java.util.Set;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccountRepository {
-    private final String pathLocation;
+    private final Path path;
 
     public AccountRepository(String pathLocation) {
-        this.pathLocation = pathLocation;
+        this.path = Paths.get(pathLocation);
     }
 
     public List<Account> findAll() {
-        Path path = Paths.get(pathLocation);
         try {
             List<String> files = Files.readAllLines(path, UTF_8);
             String duplicateAccountNumber = findDuplicateAccountNumber(files);
@@ -69,5 +71,36 @@ public class AccountRepository {
                 .toList();
 
         return result.size() > 0 ? result.get(0) : "";
+    }
+
+    public Account update(Account accountUpdate) {
+        try {
+            List<String> accounts = Files
+                    .readAllLines(path, UTF_8)
+                    .stream()
+                    .skip(1)
+                    .map(text -> text.contains(accountUpdate.getAccountNumber()) ? getStringTemplate(accountUpdate) : System.lineSeparator() + text)
+                    .toList();
+
+            Files.writeString(path, "Account,Number Name,PIN,Balance", UTF_8);
+            for (String account : accounts) {
+                Files.writeString(path, account, UTF_8, StandardOpenOption.APPEND);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return accountUpdate;
+    }
+
+    public String getStringTemplate(Account account) {
+        return String.format("%s%s,%s,%s,%s",
+                System.lineSeparator(),
+                account.getAccountNumber(),
+                account.getName(),
+                account.getPin(),
+                account.getBalance()
+        );
     }
 }

@@ -15,20 +15,20 @@ import static entity.TransactionType.CREDIT;
 import static entity.TransactionType.DEBIT;
 
 public class TransactionService {
-    private final List<Transaction> transactions;
+    private final TransactionRepository transactionRepository;
     private final AccountService accountService;
 
     public TransactionService(TransactionRepository transactionRepository, AccountService accountService) {
-        this.transactions = transactionRepository.findAll();
+        this.transactionRepository = transactionRepository;
         this.accountService = accountService;
     }
 
     public List<Transaction> findAll() {
-        return transactions;
+        return transactionRepository.findAll();
     }
 
     public List<Transaction> getTransactionHistory(String accountNumber) {
-        return transactions
+        return transactionRepository.findAll()
                 .stream()
                 .filter(transaction -> transaction.getAccountNumber().equals(accountNumber))
                 .sorted(Comparator.comparing(Transaction::getCreatedAt))
@@ -45,7 +45,8 @@ public class TransactionService {
         }
 
         loggedAccount.setBalance(loggedAccount.getBalance() - amount);
-        transactions.add(new Transaction(getId(), DEBIT, WITHDRAW, amount, loggedAccount.getAccountNumber(), LocalDateTime.now()));
+        accountService.update(loggedAccount);
+        transactionRepository.create(new Transaction(DEBIT, WITHDRAW, amount, loggedAccount.getAccountNumber(), LocalDateTime.now()));
 
         return true;
     }
@@ -65,14 +66,12 @@ public class TransactionService {
         }
 
         senderAccount.setBalance(senderAccount.getBalance() - amount);
-        transactions.add(new Transaction(getId(), DEBIT, TRANSFER, amount, senderAccount.getAccountNumber(), LocalDateTime.now()));
+        accountService.update(senderAccount);
+        transactionRepository.create(new Transaction(DEBIT, TRANSFER, amount, senderAccount.getAccountNumber(), LocalDateTime.now()));
 
         receiverAccount.setBalance(receiverAccount.getBalance() + amount);
-        transactions.add(new Transaction(getId(), CREDIT, TRANSFER, amount, receiverAccount.getAccountNumber(), LocalDateTime.now()));
+        accountService.update(receiverAccount);
+        transactionRepository.create(new Transaction(CREDIT, TRANSFER, amount, receiverAccount.getAccountNumber(), LocalDateTime.now()));
         return true;
-    }
-
-    private Long getId() {
-        return transactions.size() + 1L;
     }
 }
