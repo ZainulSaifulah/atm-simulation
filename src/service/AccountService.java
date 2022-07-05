@@ -6,13 +6,7 @@ import entity.Account;
 import java.util.List;
 
 public class AccountService {
-    private final List<Account> accounts;
-    private Account loggedAccount;
-
-    public AccountService(DummyAccountData dummyAccountData) {
-        this.accounts = dummyAccountData.getData();
-    }
-
+    private final List<Account> accounts = new DummyAccountData().getData();
     public List<Account> findAll() {
         return accounts;
     }
@@ -23,48 +17,37 @@ public class AccountService {
                 return account;
             }
         }
-        return new Account("", "", 0, "");
+        return null;
     }
 
-    public boolean login(String accountNumber, String pin) {
-        Account account = findOne(accountNumber);
+    public boolean withdraw(String accountNumber, int amount) {
+        Account account = this.findOne(accountNumber);
 
-        return account.getPin().equals(pin) && setLoggedAccount(account);
-    }
-
-    private boolean setLoggedAccount(Account account) {
-        this.loggedAccount = account;
-        return true;
-    }
-
-    public Account getLoggedAccount() {
-        return this.loggedAccount;
-    }
-
-    public boolean withdraw(int amount) {
-        if (amount > loggedAccount.getBalance()) {
+        if (amount > account.getBalance()) {
             System.out.println("Insufficient balance $" + amount);
             return false;
         }
 
-        loggedAccount.setBalance(loggedAccount.getBalance() - amount);
+        account.setBalance(account.getBalance() - amount);
         return true;
     }
 
-    public boolean transfer(String accountNumber, int amount) {
-        Account account = findOne(accountNumber);
-        if (account.getAccountNumber() == "") {
+    public boolean transfer(String senderAccountNumber, String receiverAccountNumber, int amount) {
+        Account senderAccount = findOne(senderAccountNumber);
+        Account receiverAccount = findOne(receiverAccountNumber);
+
+        if (receiverAccount == null) {
             System.out.println("Invalid account");
             return false;
         }
 
-        if (amount > loggedAccount.getBalance()) {
+        if (amount > senderAccount.getBalance()) {
             System.out.println("Insufficient balance $" + amount);
             return false;
         }
 
-        loggedAccount.setBalance(loggedAccount.getBalance() - amount);
-        account.setBalance(account.getBalance() + amount);
+        senderAccount.setBalance(senderAccount.getBalance() - amount);
+        receiverAccount.setBalance(receiverAccount.getBalance() + amount);
         return true;
     }
 }
