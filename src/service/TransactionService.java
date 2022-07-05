@@ -7,7 +7,6 @@ import repository.TransactionRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 import static entity.SourceType.TRANSFER;
 import static entity.SourceType.WITHDRAW;
@@ -18,9 +17,9 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountService accountService;
 
-    public TransactionService(TransactionRepository transactionRepository, AccountService accountService) {
-        this.transactionRepository = transactionRepository;
-        this.accountService = accountService;
+    public TransactionService() {
+        this.transactionRepository = new TransactionRepository();
+        this.accountService = new AccountService();
     }
 
     public List<Transaction> findAll() {
@@ -36,8 +35,8 @@ public class TransactionService {
                 .toList();
     }
 
-    public boolean withdraw(int amount) {
-        Account loggedAccount = accountService.getLoggedAccount();
+    public boolean withdraw(String accountNumber, int amount) {
+        Account loggedAccount = accountService.findOne(accountNumber);
 
         if (amount > loggedAccount.getBalance()) {
             System.out.println("Insufficient balance $" + amount);
@@ -51,11 +50,11 @@ public class TransactionService {
         return true;
     }
 
-    public boolean transfer(String accountNumber, int amount) {
-        Account receiverAccount = accountService.findOne(accountNumber);
-        Account senderAccount = accountService.getLoggedAccount();
+    public boolean transfer(String senderAccountNumber, String receiverAccountNumber, int amount) {
+        Account senderAccount = accountService.findOne(senderAccountNumber);
+        Account receiverAccount = accountService.findOne(receiverAccountNumber);
 
-        if (Objects.equals(receiverAccount.getAccountNumber(), "")) {
+        if (receiverAccount == null) {
             System.out.println("Invalid account");
             return false;
         }

@@ -4,6 +4,7 @@ import entity.Account;
 
 public class LoggedService {
     private final AccountService accountService = new AccountService();
+    private final TransactionService transactionService = new TransactionService();
     private Account loggedAccount;
 
     public boolean login(String accountNumber, String pin) {
@@ -21,10 +22,10 @@ public class LoggedService {
     }
 
     public boolean withdraw(int amount) {
-        return accountService.withdraw(loggedAccount.getAccountNumber(), amount);
+        return transactionService.withdraw(loggedAccount.getAccountNumber(), amount);
     }
 
     public boolean transfer(String receiverAccountNumber, int amount) {
-        return accountService.transfer(loggedAccount.getAccountNumber(), receiverAccountNumber, amount);
+        return transactionService.transfer(loggedAccount.getAccountNumber(), receiverAccountNumber, amount);
     }
 }

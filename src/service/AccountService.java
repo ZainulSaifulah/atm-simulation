@@ -1,18 +1,24 @@
 package service;
 
-import data.DummyAccountData;
 import entity.Account;
+import repository.AccountRepository;
 
 import java.util.List;
 
+import static util.Configuration.filePath;
+
 public class AccountService {
-    private final List<Account> accounts = new DummyAccountData().getData();
+    private final AccountRepository accountRepository;
+
+    public AccountService() {
+        this.accountRepository = new AccountRepository(filePath);
+    }
     public List<Account> findAll() {
-        return accounts;
+        return accountRepository.findAll();
     }
 
     public Account findOne(String accountNumber) {
-        for (Account account : accounts) {
+        for (Account account : accountRepository.findAll()) {
             if (account.getAccountNumber().equals(accountNumber)) {
                 return account;
             }
@@ -20,34 +26,7 @@ public class AccountService {
         return null;
     }
 
-    public boolean withdraw(String accountNumber, int amount) {
-        Account account = this.findOne(accountNumber);
-
-        if (amount > account.getBalance()) {
-            System.out.println("Insufficient balance $" + amount);
-            return false;
-        }
-
-        account.setBalance(account.getBalance() - amount);
-        return true;
-    }
-
-    public boolean transfer(String senderAccountNumber, String receiverAccountNumber, int amount) {
-        Account senderAccount = findOne(senderAccountNumber);
-        Account receiverAccount = findOne(receiverAccountNumber);
-
-        if (receiverAccount == null) {
-            System.out.println("Invalid account");
-            return false;
-        }
-
-        if (amount > senderAccount.getBalance()) {
-            System.out.println("Insufficient balance $" + amount);
-            return false;
-        }
-
-        senderAccount.setBalance(senderAccount.getBalance() - amount);
-        receiverAccount.setBalance(receiverAccount.getBalance() + amount);
-        return true;
+    public Account update(Account account) {
+        return accountRepository.update(account);
     }
 }
