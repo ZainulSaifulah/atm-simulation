@@ -1,11 +1,11 @@
-package service;
+package com.zainul.atm.service;
 
-import entity.Account;
-import repository.AccountRepository;
+import com.zainul.atm.entity.Account;
+import com.zainul.atm.repository.AccountRepository;
 
 import java.util.List;
 
-import static util.Configuration.filePath;
+import static com.zainul.atm.util.Configuration.filePath;
 
 public class AccountService {
     private final AccountRepository accountRepository;

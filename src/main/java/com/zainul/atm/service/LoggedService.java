@@ -1,6 +1,6 @@
-package service;
+package com.zainul.atm.service;
 
-import entity.Account;
+import com.zainul.atm.entity.Account;
 
 public class LoggedService {
     private final AccountService accountService = new AccountService();

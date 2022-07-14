@@ -1,4 +1,4 @@
-package entity;
+package com.zainul.atm.entity;
 
 public class Account {
     private String name;

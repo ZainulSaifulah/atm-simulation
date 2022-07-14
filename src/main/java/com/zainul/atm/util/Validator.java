@@ -1,4 +1,4 @@
-package util;
+package com.zainul.atm.util;
 
 import java.util.Random;
 

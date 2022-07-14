@@ -1,8 +1,8 @@
-package repository;
+package com.zainul.atm.repository;
 
-import entity.SourceType;
-import entity.Transaction;
-import entity.TransactionType;
+import com.zainul.atm.entity.SourceType;
+import com.zainul.atm.entity.Transaction;
+import com.zainul.atm.entity.TransactionType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,7 +15,7 @@ import java.util.List;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TransactionRepository {
-    private final Path path = Paths.get("./transaction.csv");
+    private final Path path = Paths.get("src/main/resources/transaction.csv");
 
     public List<Transaction> findAll() {
         try {

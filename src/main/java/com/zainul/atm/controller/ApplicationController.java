@@ -1,9 +1,9 @@
-package controller;
+package com.zainul.atm.controller;
 
-import service.LoggedService;
+import com.zainul.atm.service.LoggedService;
 
-import static util.InputHandler.*;
-import static view.ApplicationView.*;
+import static com.zainul.atm.util.InputHandler.*;
+import static com.zainul.atm.view.ApplicationView.*;
 
 public class ApplicationController {
     private final LoggedService loggedService;

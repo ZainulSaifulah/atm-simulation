@@ -1,9 +1,9 @@
-package util;
+package com.zainul.atm.util;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import static util.Validator.*;
+import static com.zainul.atm.util.Validator.*;
 
 public class InputHandler {
     public static final String ACCOUNT_NUMBER = "ACCOUNT_NUMBER";

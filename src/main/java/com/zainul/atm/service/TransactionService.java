@@ -1,17 +1,17 @@
-package service;
+package com.zainul.atm.service;
 
-import entity.Account;
-import entity.Transaction;
-import repository.TransactionRepository;
+import com.zainul.atm.entity.Account;
+import com.zainul.atm.entity.Transaction;
+import com.zainul.atm.repository.TransactionRepository;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
-import static entity.SourceType.TRANSFER;
-import static entity.SourceType.WITHDRAW;
-import static entity.TransactionType.CREDIT;
-import static entity.TransactionType.DEBIT;
+import static com.zainul.atm.entity.SourceType.TRANSFER;
+import static com.zainul.atm.entity.SourceType.WITHDRAW;
+import static com.zainul.atm.entity.TransactionType.CREDIT;
+import static com.zainul.atm.entity.TransactionType.DEBIT;
 
 public class TransactionService {
     private final TransactionRepository transactionRepository;
